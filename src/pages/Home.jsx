@@ -1,8 +1,9 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { AppContext } from "../App.jsx";
-import {  useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { setCurrentPage } from "../redux/slices/paginationSlice.js";
 import { setSortIndex, setCategoryIndex } from "../redux/slices/filterSlice.js";
+import { setItems } from "../redux/slices/pizzasSlice.js"; 
 import axios from "axios";
 import qs from "qs";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +43,7 @@ const Home = () => {
   //Активный интекс сортировки
   let activeSortIndex = useSelector(state => state.filterSliceReducer.sortIndex);
   //Состояние каталога
-  const [catalogItems, setCatalogItems] = useState([]);
+  const { items } = useSelector(state => state.pizzasSliceReducer.items); 
   //Состояние загрузки карточек с пицами
   const [isLoading, setIsLoading] = useState(true);
   //Пагинация-----------
@@ -59,10 +60,15 @@ const Home = () => {
       ? `&search=${searchValue}`
       : `category=${activeIndexCategories}&sortBy=${sortParam}&order=${sortOrder}`;
     let url = `https://648b792b17f1536d65eafd99.mockapi.io/catalog?${searchParam}`;
-    const itemsData = await axios.get(url).then(response => response.data);
-    setIsLoading(false);
-    //Обновляю состояние каталога 
-    setCatalogItems(itemsData);
+
+    try {
+      const itemsData = await axios.get(url).then(response => response.data);
+      setIsLoading(false);
+      //Обновляю состояние каталога 
+      dispatch(setItems(itemsData));
+    } catch (error) {
+      alert("Не удалось загрузить каталог");
+    }
   };
   
 
@@ -119,7 +125,7 @@ const Home = () => {
           // catalogItems.map(obj => (isLoading ? <SkeletonPizza /> : <PizzaBlock {...obj} key={obj.id}/>))
           isLoading
             ? [...Array(6)].map((obj, index) => <SkeletonPizza key={index} />)
-            : catalogItems
+            : items
               .slice(
                 pageSize * currentPage - pageSize,
                 pageSize * currentPage
@@ -133,14 +139,13 @@ const Home = () => {
               ))
         }
       </div>
-      {
+      <Pagination />
+      {/* {
         //Если количество карточек больше максимального кол-во карточек на странице, рендерю пагинацию
-        catalogItems.length > pageSize && (
-          <Pagination
-            catalogItemsLen={catalogItems.length}
-          />
+        items.length > pageSize && (
+          <Pagination />
         )
-      }
+      } */}
     </>
   );
 };

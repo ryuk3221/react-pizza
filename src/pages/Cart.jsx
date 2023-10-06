@@ -20,7 +20,15 @@ const Cart = () => {
   }
 
 
-  const getTotalPizzasCount = (arr) => {arr.reduce((totalCount, item ) => {totalCount + item.count}, 0)};
+  const getTotalPizzasCount = (arr) => {
+    let result = 0;
+    arr.forEach(pizza => {
+      result += pizza.count;
+    });
+    return result;
+  };
+  
+  
 
   return (
     <div className="content">
@@ -111,7 +119,7 @@ const Cart = () => {
                 <div className="cart__bottom-details">
                   <span>
                     {" "}
-                    Всего пицц: <b>{cartItems.length} шт.</b>{" "}
+                    Всего пицц: <b>{getTotalPizzasCount(cartItems)} шт.</b>{" "}
                   </span>
                   <span>
                     {" "}

@@ -3,12 +3,13 @@ import { setCurrentPage } from '../../redux/slices/paginationSlice';
 import styles from './Pagination.module.scss';
 
 
-const Pagination = ({ catalogItemsLen }) => {
+const Pagination = () => {
   const dispatch = useDispatch();
+  const { items } = useSelector(state => state.pizzasSliceReducer.items);
   const currentPage = useSelector(state => state.paginationReducer.currentPage);
   const pageSize = useSelector(state => state.paginationReducer.pageSize);
   //Генерирую массив чтобы отрендерить ссылки пагинации
-  let pagesArr = [...Array(Math.ceil(catalogItemsLen / pageSize))];
+  let pagesArr = [...Array(Math.ceil(16 / pageSize))];
   
   const handleNextPage = () => {
     if (currentPage < pagesArr.length) {
